@@ -15,8 +15,10 @@ with (open("11", "r")) as f:
             it = line.split(": ")[1]
             items.append(deque(int(k) for k in it.split(", ")))
         elif line.startswith("Operation"):
-            op = line.split("= ")[1].split(" ")
-            operations.append(op)
+            a, op, b = line.split("= ")[1].split(" ")
+            def o(x, y): return x + y if op == '+' else x * y
+            operations.append(lambda x: o(x if a == "old" else int(
+                a), x if b == "old" else int(b)))
         elif line.startswith("Test"):
             s = line.split(" ")
             curTest = int(s[-1])
@@ -26,7 +28,7 @@ with (open("11", "r")) as f:
             toThrow = int(s[-1])
         else:
             s = line.split(" ")
-            rules.append((curTest, toThrow, int(s[-1])))
+            rules.append(lambda x: toThrow if x % curTest == 0 else int(s[-1]))
 counts = [0]*len(items)
 
 
@@ -36,14 +38,10 @@ def loop(num_iter, decr_stress):
             counts[i] += len(val)
             while len(val):
                 item = val.popleft()
-                a, op, b = operations[i]
-                def o(x, y): return x + y if op == '+' else x * y
-                computed = o(item if a == "old" else int(
-                    a), item if b == "old" else int(b))
+                computed = operations[i](item)
                 item = computed//3 if decr_stress else computed
                 item = item % prod
-                cond, a, b = rules[i]
-                toAppend = a if item % cond == 0 else b
+                toAppend = rules[i](item)
                 items[toAppend].append(item)
 
 
