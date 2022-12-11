@@ -4,6 +4,7 @@ items = []
 operations = []
 rules = []
 curTest, toThrow = 0, 0
+prod = 1
 
 with (open("11", "r")) as f:
     for line in f.read().splitlines():
@@ -19,13 +20,13 @@ with (open("11", "r")) as f:
         elif line.startswith("Test"):
             s = line.split(" ")
             curTest = int(s[-1])
+            prod *= curTest
         elif line.startswith("If true"):
             s = line.split(" ")
             toThrow = int(s[-1])
         else:
             s = line.split(" ")
             rules.append((curTest, toThrow, int(s[-1])))
-
 counts = [0]*len(items)
 
 
@@ -40,6 +41,7 @@ def loop(num_iter, decr_stress):
                 computed = o(item if a == "old" else int(
                     a), item if b == "old" else int(b))
                 item = computed//3 if decr_stress else computed
+                item = item % prod
                 cond, a, b = rules[i]
                 toAppend = a if item % cond == 0 else b
                 items[toAppend].append(item)
@@ -53,7 +55,6 @@ def part_2():
     loop(10000, False)
 
 
-part_1()
+part_2()
 counts.sort()
-print(counts)
 print(counts[-1]*counts[-2])
