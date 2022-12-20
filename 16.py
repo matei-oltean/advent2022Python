@@ -22,14 +22,13 @@ def flatten(flows, neigh):
                 new_frontier.update(neigh[n])
             dist += 1
             frontier = new_frontier
+    for key in res:
+        res[key] = [(n, d+1) for (n, d) in res[key]]
     return res
 
 
 def open_flows(m, flows):
     def open_flow(remaining, node, visited, res):
-        remaining -= 1
-        if remaining <= 0:
-            return res
         res += flows[node]*remaining
         res2 = res
         new_visited = visited.copy()
@@ -39,7 +38,7 @@ def open_flows(m, flows):
                 res2 = max(res2, open_flow(
                     remaining - dist, neigh, new_visited, res))
         return res2
-    return open_flow(31, "AA", set(), 0)
+    return open_flow(30, "AA", set(), 0)
 
 
 flows = {}
